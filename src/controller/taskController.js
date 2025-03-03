@@ -2,8 +2,7 @@ import * as taskServices from "../services/taskServices.js"
 
 export const createTask = async (req, res, next) => {
     try {
-        const { user } = req.user;
-        const userId = user.id
+        const userId = req.userId;
         const { title, description, dueDate, priority, status } = req.body;
         const task = { title, description, dueDate, priority, status, userId };
         const createdTask = await taskServices.createTask(task);
@@ -12,10 +11,11 @@ export const createTask = async (req, res, next) => {
         next(error);
     }
 };
-export const fetchAllTasks = async (res, req, next) => {
+export const fetchAllTasks = async (req, res, next) => {
     try {
-        const user = req.user
-        const tasks = await taskServices.fetchAllTasks(user.id)
+        const userId = req.userId
+        console.log("userId from token", userId);
+        const tasks = await taskServices.fetchAllTasks(userId)
         return res.status(200).json({ sucesss: true, message: "Tasks fetched successfully", tasks})
 
     }catch(error){
@@ -37,7 +37,7 @@ export const fetchOneTask = async (req, res, next) => {
 export const updateTask = async (req, res, next) => { 
     try{
         const taskId = req.params.taskId
-        const {task} = req.body
+        const task = req.body
         const updatedTask = await taskServices.findTaskAndUpdate(taskId, task)
         return res.status(200).json({ success: true, message: "Task updated successfully", updatedTask})
     }

@@ -8,8 +8,9 @@ const authMiddleware = (req, res, next) => {
     }
 
     try {
-        const decoded = jsonwebtoken.verify(token, "your-secret-key");
+        const decoded = jsonwebtoken.verify(token, process.env.JWT_SECRET);
         req.userId = decoded.userId;
+        console.log("userId in middleware", req.userId)
         next();
     } catch (error) {
         res.status(400).json({ error: "Invalid token." });

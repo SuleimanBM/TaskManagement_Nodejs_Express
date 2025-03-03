@@ -5,7 +5,7 @@ import authMiddleware from "../middlewares/token.js"
 
 const router = Router()
 
-router.use("auth", authRouter)
+router.use("/auth", authRouter)
 router.use("/todo", authMiddleware ,taskRouter)
 
 export default router

@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import db from "../config/db.js"
+
 
 const taskSchema = new mongoose.Schema({
     userId: {
@@ -23,7 +25,7 @@ const taskSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ["pending", "in progress", "completed"]
+        enum: ["pending", "inProgress", "completed"]
     }
 })
 

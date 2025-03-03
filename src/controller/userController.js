@@ -1,4 +1,4 @@
-import * as userServices from "../services/taskServices.js";
+import * as userServices from "../services/userServices.js";
 import { comparePassword } from "../utils/passwordUtil.js";
 import { genrateToken } from "../utils/tokenUtil.js";
 
@@ -7,7 +7,7 @@ export const registerUser = async (req, res, next) => {
         const {name, email, password} = req.body;
         const user = await userServices.registerUser(name, email, password);
         const token = await genrateToken(user._id);
-        return res.status(200).json({success: true,message: "Registration successful", token})
+        return res.status(200).json({success: true,message: "Registration successful", token: token})
     }catch(error){
         next(error);
     }

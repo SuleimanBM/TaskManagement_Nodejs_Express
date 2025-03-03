@@ -1,6 +1,8 @@
 import jsonwebtoken from 'jsonwebtoken';
 
 export const genrateToken = async(userId) => { 
-    jsonwebtoken.sign({ userId }, process.env , {
-    expiresIn: "15d",
-})}
+    const token = jsonwebtoken.sign({ userId }, process.env.JWT_SECRET , {
+    expiresIn: "15d",})
+
+    return token;
+}

@@ -1,14 +1,14 @@
-import userModel from "../models/userModels";
+import userModel from "../models/userModels.js";
 import createHttpError from "http-errors";
-import { hashPassword } from "../utils/passwordUtil";
+import { hashPassword } from "../utils/passwordUtil.js";
 
 
 export const registerUser = async (name, email, password,) => {
     if(!name || !email || !password) {
-        throw new createHttpError.BadRequest("Invalid data")
+        throw createHttpError.BadRequest("Invalid data")
     }
-    const hashPassword = hashPassword(password);
-    const user = await userModel.create({name: name, email: email, password: hashPassword})
+    password = await hashPassword(password);
+    const user = await userModel.create({ name, email, password})
     user.save()
     return user
 }
@@ -16,7 +16,7 @@ export const registerUser = async (name, email, password,) => {
 
 export const loginUser = async (email) => {
     if (!email) {
-        throw new createHttpError.BadRequest("Invalid data")
+        throw createHttpError.BadRequest("Invalid data")
     }
     const user = await userModel.findOne({email: email})
     return user; 
