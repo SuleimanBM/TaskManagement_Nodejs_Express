@@ -14,8 +14,9 @@ export const createTask = async (req, res, next) => {
 export const fetchAllTasks = async (req, res, next) => {
     try {
         const userId = req.userId
+        const filters = req.filters
         console.log("userId from token", userId);
-        const tasks = await taskServices.fetchAllTasks(userId)
+        const tasks = await taskServices.fetchAllTasks(userId, filters)
         return res.status(200).json({ sucesss: true, message: "Tasks fetched successfully", tasks})
 
     }catch(error){

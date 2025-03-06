@@ -14,11 +14,15 @@ export const createTask = async (task) => {
     return createdTask
 }
 
-export const fetchAllTasks = async(userId) => {
+export const fetchAllTasks = async(userId, filters) => {
     if(!userId) {
         throw createHttpError.BadRequest("UserId is required")
     }
-    const tasks = await taskModel.find({userId: userId})
+    const {sort,...newFilters} = filters
+    const query  = {userId, ...newFilters}
+
+    const tasks = await taskModel.find(query).sort(sort)
+
     if(!tasks) {
         throw createHttpError.NotFound("No tasks found")
     }
@@ -29,7 +33,9 @@ export const fetchTaskById = async (taskId) => {
     if(!taskId) {
         throw createHttpError.BadRequest("TaskId is required")
     }
+
     const task = await taskModel.findById(taskId)
+
     if(!task) {
         throw createHttpError.NotFound("No such tasks found")
     }
@@ -40,7 +46,7 @@ export const findTaskAndUpdate = async (taskId, task) => {
     if(!taskId){
         throw createHttpError.BadRequest("TaskId is required")
     }
-    const updatedTask = await taskModel.findByIdAndUpdate(taskId, {$set: task}, {new: true, upsert: true})
+    const updatedTask = await taskModel.findByIdAndUpdate(taskId, {$set: task}, {new: true, upsert: false})
     if(!updatedTask) {
         throw createHttpError.InternalServerError("An unexpected error occurred")
     }

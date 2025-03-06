@@ -8,9 +8,13 @@ const authMiddleware = (req, res, next) => {
     }
 
     try {
-        const decoded = jsonwebtoken.verify(token, process.env.JWT_SECRET);
+        const decoded = jsonwebtoken.verify(token, process.env.ACCESS_TOKEN_SECRET);
+        if (!decoded) {
+            throw new createHttpError.Forbidden("Token invalid or expired")
+        }
+
         req.userId = decoded.userId;
-        console.log("userId in middleware", req.userId)
+        
         next();
     } catch (error) {
         res.status(400).json({ error: "Invalid token." });
