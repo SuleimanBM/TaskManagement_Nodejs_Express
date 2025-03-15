@@ -15,7 +15,7 @@ const taskValidationSchema = Joi.object({
 const userValidationSchema = Joi.object({
     name: Joi.string(),
     email: Joi.string().required().email(),
-    password: Joi.string().required().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')),
+    password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')),
 })
 
 export const validateTask = (req, res, next) => {

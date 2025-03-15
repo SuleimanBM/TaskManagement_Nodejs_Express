@@ -1,13 +1,13 @@
 import jsonwebtoken from 'jsonwebtoken';
 
-export const genrateAccessToken = async(userId) => { 
+export const generateAccessToken = async(userId) => { 
     const token = jsonwebtoken.sign({ userId }, process.env.ACCESS_TOKEN_SECRET , {
     expiresIn: "15m",})
 
     return token;
 }
 
-export const genrateRefreshToken = async (userId) => {
+export const generateRefreshToken = async (userId) => {
     const token = jsonwebtoken.sign({ userId }, process.env.ACCESS_TOKEN_SECRET, {
         expiresIn: "7d",
     })

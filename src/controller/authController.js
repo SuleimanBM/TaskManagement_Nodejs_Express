@@ -1,15 +1,35 @@
 import * as userServices from "../services/authServices.js";
-import { comparePassword } from "../utils/passwordUtil.js";
-import { genrateAccessToken, genrateRefreshToken, verifyRefreshToken,} from "../utils/generateToken.js";
-import { sendResetEmail } from "../utils/sendMail.js";
+import { comparePassword, hashPassword } from "../utils/passwordUtil.js";
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken,} from "../utils/generateToken.js";
+import sendResetEmail from "../utils/sendResetEmail.js";
+import generateRandomToken from "../utils/randomToken.js";
+import { fileURLToPath } from 'url';
+import path from "path";
+import { dirname } from 'path';
 
 
+export const googleAuth = async (req, res, next) => {
+    res.status(200).send("success");
+}
 export const registerUser = async (req, res, next) => {
     try{
         const {name, email, password} = req.body;
+
         const user = await userServices.registerUser(name, email, password);
-        const token = await genrateToken(user._id);
-        return res.status(200).json({success: true,message: "Registration successful", token: token})
+
+        const newAccessToken = await generateAccessToken(user._id);
+        const newRefreshToken = await generateRefreshToken(user._id);
+
+        await userServices.storeRefreshToken(user._id, newRefreshToken)
+
+        res.cookie('refreshToken', newRefreshToken, {
+            httpOnly: false,
+            secure: false,      // Use true in production
+            sameSite: 'Strict', // Adjust as needed
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+
+        return res.status(200).json({ success: true,message: "Registration Successful", newAccessToken })
     }catch(error){
         next(error);
     }
@@ -19,7 +39,7 @@ export const loginUser = async (req, res, next) => {
     try {
         const {email, password} = req.body;
 
-        const user = await userServices.findUserBy(email);
+        const user = await userServices.findUserByEmail(email);
 
         const match = await comparePassword(password, user.password);
 
@@ -27,8 +47,8 @@ export const loginUser = async (req, res, next) => {
             return res.status(401).json({success: false, message: "Passwords do not match"})
         }
 
-        const newAccessToken = await genrateAccessToken(user._id);
-        const newRefreshToken = await genrateRefreshToken(user._id);
+        const newAccessToken = await generateAccessToken(user._id);
+        const newRefreshToken = await generateRefreshToken(user._id);
 
         await userServices.storeRefreshToken(user._id,newRefreshToken)
 
@@ -50,12 +70,12 @@ export const forgotPassword = async (req, res, next)=> {
     try {
         const {email} = req.body;
 
-        await userServices.findUserBy(email);
+        const user = await userServices.findUserByEmail(email);
 
-        const resetToken = await genrateRefreshToken();
+        const resetToken = generateRandomToken();
         const resetTokenExpiry = Date.now() + 15 * 60 * 1000; 
 
-        await userServices.storeRefreshToken(resetToken, resetTokenExpiry)
+        await userServices.findUserAndUpdate(email, resetToken, resetTokenExpiry)
 
         const resetUrl = `http://localhost:8000/auth/reset-password?token=${resetToken}`;
 
@@ -67,27 +87,33 @@ export const forgotPassword = async (req, res, next)=> {
     }
 }
 
+export const getResetPasswordPage = async (req, res, next)=> {
+    const __dirname = dirname(fileURLToPath(import.meta.url));
+    try {
+        return res.sendFile(path.join(__dirname, '../views/reset-password.html'));
+    }catch(error){
+        next(error)
+    }
+}
+
 export const resetPassword = async (req, res, next)=> {
-        const { token, newPassword } = req.body;
+       try {
+           const { token, newPassword } = req.body;
 
-        // Find the user by the reset token
-        const user = await userServices.findUserByResetToken(token,password);
+           // Find the user by the reset token
+           const user = await userServices.findUserByResetToken(token);
 
-        if (!user) {
-            return res.status(400).json({ message: "Invalid or expired token" });
-        }
+           if (!user) {
+               return res.status(400).json({ message: "Invalid or expired token" });
+           }
 
-        // Hash the new password
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
+           await userServices.findUserAndUpdatePassword(token, newPassword, null)
 
-        // Update the user's password and clear the reset token
-        user.password = hashedPassword;
-        user.resetToken = undefined;
-        user.resetTokenExpiry = undefined;
-        await user.save();
+           res.status(200).json({ message: "Password reset successful" });
 
-        res.status(200).json({ message: "Password reset successful" });
-
+       }catch(error){
+        next(error)
+       }
 }
 
 export const refreshToken = async (req, res, next) => {
@@ -104,17 +130,17 @@ export const refreshToken = async (req, res, next) => {
         }
         const userId = decoded.userId
 
-        const user = await userServices.findUserInRefreshToken(userId);
+        const user = await userServices.findUserInStoredRefreshToken(userId);
 
         if (user.token !== token) {
             return res.status(403).json({ message: 'Refresh token does not match stored token' });
         }
 
 
-        const newAccessToken = await genrateAccessToken(userId);
-        const newRefreshToken = await genrateRefreshToken(userId);
+        const newAccessToken = await generateAccessToken(userId);
+        const newRefreshToken = await generateRefreshToken(userId);
 
-        
+
         await userServices.storeRefreshToken(user._id, newRefreshToken)
 
         res.status(200).cookie('refreshToken', newRefreshToken, {
@@ -129,6 +155,5 @@ export const refreshToken = async (req, res, next) => {
     }catch(error){
         next(error)
     }
-    
 
 }

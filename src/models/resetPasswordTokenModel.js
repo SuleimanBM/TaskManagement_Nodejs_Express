@@ -1,18 +1,11 @@
-import mongoose from "mongoose";
-import db from "../config/db.js"
+// import mongoose from "mongoose";
+// import db from "../config/db.js"
 
 
-const resetPasswordTokenSchema = new mongoose.Schema({
-    resetToken:{
-        type: String,
-        required: true,
-    },
-    resetToken:{
-        type: Date,
-        required: true,
-    }
-})
+// const resetPasswordTokenSchema = new mongoose.Schema({
+    
+// })
 
-const resetPasswordTokenModel = mongoose.model("refreshToken", resetPasswordTokenSchema)
+// const resetPasswordTokenModel = mongoose.model("refreshToken", resetPasswordTokenSchema)
 
-export default resetPasswordTokenModel
+// export default resetPasswordTokenModel

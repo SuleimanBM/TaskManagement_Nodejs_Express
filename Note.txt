@@ -1,10 +1,10 @@
-Data Validation:
+(checked) Data Validation:
 Validate user input (e.g., task title, due date) using a library like Joi or Express Validator.
 
 API Documentation:
 Document your API using Swagger or Postman Collections.
 
-Filter:
+(checked)Filter:
 Filter documents(e.g., due date, priority, completion)
 
 
@@ -16,14 +16,14 @@ What You’ll Learn: In-memory caching, Redis integration.
 
 
 
-a. Rate Limiting
+(checked) a. Rate Limiting
 Prevent brute-force attacks on login/registration endpoints.
 
 Tools: Use express-rate-limit.
 
 What You’ll Learn: API security best practices.
 
-d. Refresh Tokens
+(checked) d. Refresh Tokens
 Implement long-lived refresh tokens to renew short-lived JWTs.
 
 What You’ll Learn: Token rotation, security best practices.

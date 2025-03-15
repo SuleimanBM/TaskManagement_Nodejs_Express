@@ -2,7 +2,6 @@ import userModel from "../models/authModel.js";
 import refreshTokenModel from "../models/refreshModel.js";
 import createHttpError from "http-errors";
 import { hashPassword } from "../utils/passwordUtil.js";
-import resetPasswordTokenModel from "../models/resetPasswordTokenModel.js";
 
 
 export const registerUser = async (name, email, password,) => {
@@ -15,11 +14,15 @@ export const registerUser = async (name, email, password,) => {
     return user
 }
 
-export const findUserBy = async (field) => {
+export const findUserByEmail = async (email) => {
     if (!email) {
         throw createHttpError.BadRequest("Invalid credentials")
     }
-    const user = await userModel.findOne({field})
+    const user = await userModel.findOne({email: email})
+
+    if (!user) {
+        throw createHttpError.Forbidden("User not found")
+    }
     return user;
 }
 
@@ -39,20 +42,41 @@ export const findUserInStoredRefreshToken = async (userId) => {
     return user
 }
 
-export const storeResetToken = async (resetToken, resetTokenExpiry) => {
+export const findUserAndUpdate = async (email,resetToken, resetTokenExpiry) => {
     if (!resetToken || !resetTokenExpiry) {
         throw createHttpError.BadRequest("Invalid data")
     }
 
-    await resetPasswordTokenModel.create({resetToken, resetTokenExpiry})
+    await userModel.findOneAndUpdate({email: email}, {resetToken: resetToken, resetTokenExpiry: resetTokenExpiry})
+
 }
 
-export const findUserByResetToken = async (resetToken, resetTokenExpiry) => {
-    if (!resetToken || !resetTokenExpiry) {
+export const findUserAndUpdatePassword = async (token, password) => {
+    if (!token || !password) {
         throw createHttpError.BadRequest("Invalid data")
     }
 
-    const user = await resetPasswordTokenModel.findOne({resetToken: token, resetTokenExpiry: { $gt: Date.now() },})
+    const hashedPassword = await hashPassword(password);
+
+    const user = await userModel.findOne({resetToken: token})
+    
+    user.resetToken = ""
+    user.resetTokenExpiry = ""
+    user.password = hashedPassword
+
+    user.save()
+}
+
+export const findUserByResetToken = async (resetToken) => {
+    if (!resetToken) {
+        throw createHttpError.BadRequest("Invalid data")
+    }
+
+    const user = await userModel.findOne({resetToken: resetToken, resetTokenExpiry: { $gt: Date.now() },})
+
+    if (!user) {
+        throw createHttpError.BadRequest("Invalid or expired token")
+    }
 
     return user
 }
