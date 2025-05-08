@@ -8,8 +8,12 @@ const taskValidationSchema = Joi.object({
         "date.format": "Due date must be in ISO format (YYYY-MM-DD).",
         "any.required": "Due date is required.",
     }),
-    priority: Joi.string().valid("low", "medium", "high").default("low").required(),
-    status: Joi.string().valid("pending", "inProgress", "completed").default("pending").required(),
+    time: Joi.string().optional(),
+    category: Joi.string().optional(),
+    subtasks: Joi.string().optional(),
+    isCompleted: Joi.boolean().optional(),
+    priority: Joi.string().valid("Low", "Medium", "High").default("low").required(),
+    status: Joi.string().valid("Pending", "InProgress", "Completed").default("pending").required(),
 })
 
 const userValidationSchema = Joi.object({
@@ -19,7 +23,7 @@ const userValidationSchema = Joi.object({
 })
 
 export const validateTask = (req, res, next) => {
-    const { error } = taskValidationSchema.validate(req.body, { abortEarly: false });
+    const { error } = taskValidationSchema.validate(req.body, { abortEarly: false,});
 
     if (error) {
         return res.status(400).json({

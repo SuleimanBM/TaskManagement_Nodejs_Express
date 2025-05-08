@@ -18,6 +18,9 @@ const taskSchema = new mongoose.Schema({
         type: Date,
         required: true,
     },
+    time:{
+        type: String,
+    },
     priority: {
         type: String,
         default: "low",
@@ -30,6 +33,12 @@ const taskSchema = new mongoose.Schema({
     category: {
         type: String,
         default: "General"
+    },
+    isCompleted: {
+        type: Boolean,
+    },
+    subtasks: {
+        type: String,
     }
 })
 

@@ -2,7 +2,7 @@ import jsonwebtoken from 'jsonwebtoken';
 
 export const generateAccessToken = async(userId) => { 
     const token = jsonwebtoken.sign({ userId }, process.env.ACCESS_TOKEN_SECRET , {
-    expiresIn: "15m",})
+    expiresIn: "7d",})
 
     return token;
 }

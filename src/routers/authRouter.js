@@ -147,7 +147,7 @@ router.get('/google/callback',
  *       400:
  *         description: Validation error
  */
-router.post("/register", limiter, validateUser, authController.registerUser);
+router.post("/register", /*limiter,*/ validateUser, authController.registerUser);
 
 /**
  * @swagger

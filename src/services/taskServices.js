@@ -18,10 +18,14 @@ export const fetchAllTasks = async(userId, filters) => {
     if(!userId) {
         throw createHttpError.BadRequest("UserId is required")
     }
-    const {sort,...newFilters} = filters
-    const query  = {userId, ...newFilters}
+    let tasks;
+    if(filters){
+        const { sort, ...newFilters } = filters
+        const query = { userId, ...newFilters }
 
-    const tasks = await taskModel.find(query).sort(sort)
+        tasks = await taskModel.find(query).sort(sort)
+    }
+     tasks = await taskModel.find({userId})
 
     if(!tasks) {
         throw createHttpError.NotFound("No tasks found")

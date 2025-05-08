@@ -62,7 +62,7 @@ router.post("/tasks", validateTask, taskController.createTask);
  *             $ref: '#/definitions/Task'
  */
 router.get("/tasks", taskController.fetchAllTasks);
-
+router.get("/tasks-statistics", taskController.getTaskStatistics)
 /**
  * @swagger
  * /todo/tasks/{taskId}:

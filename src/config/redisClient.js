@@ -1,7 +1,7 @@
 import Redis from "ioredis";
-// Connect to Redis running in WSL
+// Connect to Redis running locally
 const redis = new Redis({
-    host: "localhost", // or "127.0.0.1"
+    host: "localhost",
     port: 6379
 });
 

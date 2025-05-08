@@ -12,17 +12,19 @@ import swaggerSpec from "./config/documentation.js";
 
 dotenv.config()
 const app = express()
-// const redis = new Redis({
-//     host: "localhost",
-//     port: 6379
-// });
 
 app.use(cookieParser());
 app.use(bodyparser.json())
 app.use(passport.initialize())
+
+app.use((req, res, next) => {
+    console.log(`Request received: ${req.method} ${req.url}`);
+    next();
+});
+
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(routes)
-app.use("*", (req, res)=>{
+app.use("*", (req, res) => {
     res.send("Requested resource not found")
 })
 app.use(errorHandler)
