@@ -5,7 +5,7 @@ import dotenv from "dotenv"
 import routes from "./routers/index.js"
 import errorHandler from "./middlewares/error.js"
 import passport from "passport"
-import Redis from "ioredis"
+//import Redis from "ioredis"
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from "./config/documentation.js";
 

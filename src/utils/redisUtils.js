@@ -1,4 +1,4 @@
-import redis from "../config/redisClient.js";
+//import redis from "../config/redisClient.js";
 export const cacheData = async(key, value, expiry = 3600) =>{
     await redis.set(key, JSON.stringify(value), "EX", expiry);
 }
